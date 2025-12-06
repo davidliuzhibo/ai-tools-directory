@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { Layout } from "antd";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import "../styles/globals.css";
+
+const { Content } = Layout;
 
 export const metadata: Metadata = {
   title: "AI工具大全 - 发现最好的AI工具",
@@ -11,12 +16,18 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.Node;
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="zh-CN">
       <body>
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          <Layout className="min-h-screen">
+            <Header />
+            <Content>{children}</Content>
+            <Footer />
+          </Layout>
+        </AntdRegistry>
       </body>
     </html>
   );
