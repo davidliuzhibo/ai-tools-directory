@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Layout } from "antd";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "../styles/globals.css";
-
-const { Content } = Layout;
 
 export const metadata: Metadata = {
   title: "AI工具大全 - 发现最好的AI工具",
@@ -22,11 +19,11 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <AntdRegistry>
-          <Layout className="min-h-screen">
+          <div className="min-h-screen flex flex-col">
             <Header />
-            <Content>{children}</Content>
+            <main className="flex-1">{children}</main>
             <Footer />
-          </Layout>
+          </div>
         </AntdRegistry>
       </body>
     </html>

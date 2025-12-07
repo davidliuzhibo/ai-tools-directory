@@ -1,14 +1,11 @@
-import { Layout } from 'antd';
 import { GithubOutlined, TwitterOutlined, MailOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-
-const { Footer: AntFooter } = Layout;
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <AntFooter className="bg-gray-50 border-t border-gray-200 mt-16">
+    <footer className="bg-gray-50 border-t border-gray-200 mt-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-8">
           {/* About */}
@@ -103,6 +100,6 @@ export default function Footer() {
           <p>© {currentYear} AI工具大全. All rights reserved.</p>
         </div>
       </div>
-    </AntFooter>
+    </footer>
   );
 }
