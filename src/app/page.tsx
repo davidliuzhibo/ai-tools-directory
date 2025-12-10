@@ -1,3 +1,5 @@
+'use client';
+
 import { Typography, Row, Col, Divider } from "antd";
 import CategoryCard from "@/components/common/CategoryCard";
 import ToolCard from "@/components/tool/ToolCard";
