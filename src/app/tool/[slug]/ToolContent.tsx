@@ -13,6 +13,8 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import Image from 'next/image';
+import FavoriteButton from '@/components/tool/FavoriteButton';
+import CommentSection from '@/components/tool/CommentSection';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -179,6 +181,7 @@ export default function ToolContent({ tool }: ToolContentProps) {
                     </Button>
                   </a>
                 )}
+                <FavoriteButton toolId={tool.id} />
               </div>
             </div>
           </div>
@@ -260,6 +263,9 @@ export default function ToolContent({ tool }: ToolContentProps) {
             </Card>
           </Col>
         </Row>
+
+        {/* Comment Section */}
+        <CommentSection toolId={tool.id} />
       </section>
     </div>
   );

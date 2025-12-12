@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Typography, Input, Row, Col, Breadcrumb, Empty, Spin, Select } from 'antd';
-import { HomeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Typography, Input, Row, Col, Breadcrumb, Empty, Spin, Select, Card, Space, Tag } from 'antd';
+import { HomeOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import ToolCard from '@/components/tool/ToolCard';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
 
 interface Tool {
@@ -31,24 +31,25 @@ export default function SearchPage() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState<string>('all');
+  const [pricingType, setPricingType] = useState<string>('all');
+  const [teamOrigin, setTeamOrigin] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('rankingScore');
 
   useEffect(() => {
     if (initialQuery) {
       performSearch(initialQuery);
     }
-  }, [initialQuery]);
+  }, [initialQuery, category, pricingType, teamOrigin, sortBy]);
 
   const performSearch = async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setTools([]);
-      return;
-    }
-
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        q: searchQuery,
+        ...(searchQuery && { q: searchQuery }),
         ...(category !== 'all' && { category }),
+        ...(pricingType !== 'all' && { pricing: pricingType }),
+        ...(teamOrigin !== 'all' && { team: teamOrigin }),
+        sortBy,
       });
 
       const response = await fetch(`/api/search?${params}`);
@@ -118,6 +119,73 @@ export default function SearchPage() {
               </Paragraph>
             )}
           </div>
+
+          {/* Filters */}
+          <Card className="mt-6" title={<><FilterOutlined /> 筛选条件</>}>
+            <Space wrap size="large">
+              <div>
+                <Text type="secondary" className="mr-2">分类:</Text>
+                <Select
+                  value={category}
+                  onChange={setCategory}
+                  style={{ width: 150 }}
+                  options={[
+                    { value: 'all', label: '全部' },
+                    { value: 'language', label: '💬 语言' },
+                    { value: 'image', label: '🎨 画图' },
+                    { value: 'code', label: '💻 编程' },
+                    { value: 'video', label: '🎬 视频' },
+                    { value: 'note', label: '📝 笔记' },
+                    { value: 'assistant', label: '🤖 个人助理' },
+                  ]}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary" className="mr-2">价格:</Text>
+                <Select
+                  value={pricingType}
+                  onChange={setPricingType}
+                  style={{ width: 150 }}
+                  options={[
+                    { value: 'all', label: '全部' },
+                    { value: 'FREE', label: '免费' },
+                    { value: 'FREEMIUM', label: '部分免费' },
+                    { value: 'PAID', label: '付费' },
+                  ]}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary" className="mr-2">团队:</Text>
+                <Select
+                  value={teamOrigin}
+                  onChange={setTeamOrigin}
+                  style={{ width: 150 }}
+                  options={[
+                    { value: 'all', label: '全部' },
+                    { value: 'DOMESTIC', label: '国内团队' },
+                    { value: 'OUTBOUND', label: '出海团队' },
+                    { value: 'OVERSEAS', label: '海外团队' },
+                  ]}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary" className="mr-2">排序:</Text>
+                <Select
+                  value={sortBy}
+                  onChange={setSortBy}
+                  style={{ width: 150 }}
+                  options={[
+                    { value: 'rankingScore', label: '按评分' },
+                    { value: 'name', label: '按名称' },
+                    { value: 'createdAt', label: '按时间' },
+                  ]}
+                />
+              </div>
+            </Space>
+          </Card>
         </div>
       </section>
 

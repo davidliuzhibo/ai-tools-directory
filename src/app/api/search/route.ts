@@ -6,23 +6,48 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q') || '';
     const categorySlug = searchParams.get('category');
-
-    if (!query.trim()) {
-      return NextResponse.json({ tools: [] });
-    }
+    const pricingType = searchParams.get('pricing');
+    const teamOrigin = searchParams.get('team');
+    const sortBy = searchParams.get('sortBy') || 'rankingScore';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     const where: any = {
       isPublished: true,
-      OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-      ],
     };
 
+    // 搜索关键词
+    if (query.trim()) {
+      where.OR = [
+        { name: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+      ];
+    }
+
+    // 分类筛选
     if (categorySlug && categorySlug !== 'all') {
       where.category = {
         slug: categorySlug,
       };
+    }
+
+    // 价格类型筛选
+    if (pricingType && pricingType !== 'all') {
+      where.pricingType = pricingType;
+    }
+
+    // 团队来源筛选
+    if (teamOrigin && teamOrigin !== 'all') {
+      where.teamOrigin = teamOrigin;
+    }
+
+    // 排序配置
+    const orderBy: any = {};
+    if (sortBy === 'name') {
+      orderBy.name = sortOrder;
+    } else if (sortBy === 'rankingScore') {
+      orderBy.rankingScore = sortOrder;
+    } else {
+      orderBy.createdAt = sortOrder;
     }
 
     const tools = await prisma.tool.findMany({
@@ -36,10 +61,8 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: {
-        rankingScore: 'desc',
-      },
-      take: 50,
+      orderBy,
+      take: 100,
     });
 
     return NextResponse.json({ tools, count: tools.length });

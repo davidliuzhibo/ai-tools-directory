@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Layout, Menu, Input, Button } from 'antd';
 import { SearchOutlined, HomeOutlined, AppstoreOutlined } from '@ant-design/icons';
+import UserMenu from '@/components/common/UserMenu';
 
 const { Header: AntHeader } = Layout;
 const { Search } = Input;
@@ -72,6 +73,8 @@ export default function Header() {
           <Link href="/admin">
             <Button type="text">管理后台</Button>
           </Link>
+
+          <UserMenu />
         </div>
       </div>
     </AntHeader>
