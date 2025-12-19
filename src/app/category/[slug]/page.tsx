@@ -7,7 +7,7 @@ interface CategoryPageProps {
 }
 
 async function getCategoryData(slug: string) {
-  const category = await prisma.category.findUnique({
+  const category = await prisma.categories.findUnique({
     where: { slug },
     include: {
       tools: {
@@ -48,7 +48,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 }
 
 export async function generateStaticParams() {
-  const categories = await prisma.category.findMany({
+  const categories = await prisma.categories.findMany({
     select: { slug: true },
   });
 

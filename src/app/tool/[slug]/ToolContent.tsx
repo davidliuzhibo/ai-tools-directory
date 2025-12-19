@@ -31,7 +31,7 @@ const pricingTypeMap = {
 };
 
 interface ToolContentProps {
-  tool: {
+  tools: {
     id: string;
     name: string;
     slug: string;
@@ -51,7 +51,7 @@ interface ToolContentProps {
       description: string | null;
       icon: string | null;
     };
-    rankingMetrics: {
+    ranking_metrics: {
       githubStars: number;
       githubUrl: string | null;
       productHuntVotes: number;
@@ -170,14 +170,14 @@ export default function ToolContent({ tool }: ToolContentProps) {
                     </Button>
                   </a>
                 )}
-                {tool.rankingMetrics?.githubUrl && (
+                {tool.ranking_metrics?.githubUrl && (
                   <a
-                    href={tool.rankingMetrics.githubUrl}
+                    href={tool.ranking_metrics.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <Button size="large" icon={<GithubOutlined />}>
-                      GitHub ({tool.rankingMetrics.githubStars.toLocaleString()} stars)
+                      GitHub ({tool.ranking_metrics.githubStars.toLocaleString()} stars)
                     </Button>
                   </a>
                 )}
@@ -214,25 +214,25 @@ export default function ToolContent({ tool }: ToolContentProps) {
 
           <Col xs={24} lg={8}>
             {/* Metrics */}
-            {tool.rankingMetrics && (
+            {tool.ranking_metrics && (
               <Card title="数据指标" className="mb-6">
                 <div className="space-y-3">
-                  {tool.rankingMetrics.githubStars > 0 && (
+                  {tool.ranking_metrics.githubStars > 0 && (
                     <div className="flex justify-between">
                       <Text type="secondary">GitHub Stars:</Text>
-                      <Text strong>{tool.rankingMetrics.githubStars.toLocaleString()}</Text>
+                      <Text strong>{tool.ranking_metrics.githubStars.toLocaleString()}</Text>
                     </div>
                   )}
-                  {tool.rankingMetrics.productHuntVotes > 0 && (
+                  {tool.ranking_metrics.productHuntVotes > 0 && (
                     <div className="flex justify-between">
                       <Text type="secondary">Product Hunt 投票:</Text>
-                      <Text strong>{tool.rankingMetrics.productHuntVotes.toLocaleString()}</Text>
+                      <Text strong>{tool.ranking_metrics.productHuntVotes.toLocaleString()}</Text>
                     </div>
                   )}
-                  {tool.rankingMetrics.appStoreRating > 0 && (
+                  {tool.ranking_metrics.appStoreRating > 0 && (
                     <div className="flex justify-between">
                       <Text type="secondary">App Store 评分:</Text>
-                      <Text strong>{tool.rankingMetrics.appStoreRating}/5.0</Text>
+                      <Text strong>{tool.ranking_metrics.appStoreRating}/5.0</Text>
                     </div>
                   )}
                   <Divider className="my-3" />

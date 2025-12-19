@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { randomUUID } from 'crypto';
 
 // 获取工具的评论列表
 export async function GET(request: NextRequest) {
@@ -13,13 +14,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '工具ID不能为空' }, { status: 400 });
     }
 
-    const comments = await prisma.comment.findMany({
+    const comments = await prisma.comments.findMany({
       where: {
         toolId,
         parentId: null, // 只获取顶级评论
       },
       include: {
-        user: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
         },
         replies: {
           include: {
-            user: {
+            users: {
               select: {
                 id: true,
                 name: true,
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查工具是否存在
-    const tool = await prisma.tool.findUnique({
+    const tool = await prisma.tools.findUnique({
       where: { id: toolId },
     });
 
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // 如果是回复，检查父评论是否存在
     if (parentId) {
-      const parentComment = await prisma.comment.findUnique({
+      const parentComment = await prisma.comments.findUnique({
         where: { id: parentId },
       });
 
@@ -93,15 +94,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 创建评论
-    const comment = await prisma.comment.create({
+    const comment = await prisma.comments.create({
       data: {
+        id: randomUUID(),
         content: content.trim(),
         userId: session.user.id,
         toolId,
         parentId: parentId || null,
+        updatedAt: new Date(),
       },
       include: {
-        user: {
+        users: {
           select: {
             id: true,
             name: true,

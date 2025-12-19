@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { randomUUID } from 'crypto';
 
 // 获取用户的收藏列表
 export async function GET(request: NextRequest) {
@@ -12,14 +13,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '未登录' }, { status: 401 });
     }
 
-    const favorites = await prisma.favorite.findMany({
+    const favorites = await prisma.favorites.findMany({
       where: {
         userId: session.user.id,
       },
       include: {
-        tool: {
+        tools: {
           include: {
-            category: true,
+            categories: true,
           },
         },
       },
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查工具是否存在
-    const tool = await prisma.tool.findUnique({
+    const tool = await prisma.tools.findUnique({
       where: { id: toolId },
     });
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查是否已收藏
-    const existing = await prisma.favorite.findUnique({
+    const existing = await prisma.favorites.findUnique({
       where: {
         userId_toolId: {
           userId: session.user.id,
@@ -74,8 +75,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 创建收藏
-    const favorite = await prisma.favorite.create({
+    const favorite = await prisma.favorites.create({
       data: {
+        id: randomUUID(),
         userId: session.user.id,
         toolId,
       },
@@ -105,7 +107,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 删除收藏
-    await prisma.favorite.delete({
+    await prisma.favorites.delete({
       where: {
         userId_toolId: {
           userId: session.user.id,

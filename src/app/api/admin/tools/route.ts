@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkAdminPermission } from '@/lib/admin';
+import { randomUUID } from 'crypto';
 
 // 获取所有工具（管理后台用）
 export async function GET() {
   try {
-    const tools = await prisma.tool.findMany({
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
+    const tools = await prisma.tools.findMany({
       include: {
-        category: true,
-        rankingMetrics: true,
+        categories: true,
+        ranking_metrics: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -27,10 +34,16 @@ export async function GET() {
 // 创建新工具
 export async function POST(request: NextRequest) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const body = await request.json();
 
-    const tool = await prisma.tool.create({
+    const tool = await prisma.tools.create({
       data: {
+        id: randomUUID(),
         name: body.name,
         slug: body.slug,
         description: body.description,
@@ -45,6 +58,7 @@ export async function POST(request: NextRequest) {
         categoryId: body.categoryId,
         isPublished: body.isPublished ?? true,
         isFeatured: body.isFeatured ?? false,
+        updatedAt: new Date(),
       },
     });
 

@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('请输入邮箱和密码');
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: {
             email: credentials.email,
           },

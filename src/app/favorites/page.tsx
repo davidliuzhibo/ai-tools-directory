@@ -10,7 +10,7 @@ const { Title } = Typography;
 
 interface Favorite {
   id: string;
-  tool: any;
+  tools: any;
 }
 
 export default function FavoritesPage() {

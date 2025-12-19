@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkAdminPermission } from '@/lib/admin';
 
 // 获取所有用户
 export async function GET() {
   try {
-    const users = await prisma.user.findMany({
+    // 检查管理员权限
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
+    const users = await prisma.users.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
@@ -13,7 +20,7 @@ export async function GET() {
             comments: true,
           },
         },
-        admin: {
+        admins: {
           select: {
             role: true,
           },

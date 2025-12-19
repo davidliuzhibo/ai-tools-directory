@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       orderBy.createdAt = sortOrder;
     }
 
-    const tools = await prisma.tool.findMany({
+    const tools = await prisma.tools.findMany({
       where,
       include: {
         category: {

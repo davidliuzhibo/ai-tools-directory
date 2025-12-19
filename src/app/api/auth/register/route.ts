@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查用户是否已存在
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -47,11 +48,13 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 创建用户
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: randomUUID(),
         email,
         password: hashedPassword,
         name: name || email.split('@')[0],
+        updatedAt: new Date(),
       },
     });
 

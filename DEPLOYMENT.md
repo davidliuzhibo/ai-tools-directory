@@ -45,16 +45,28 @@
 3. **配置环境变量**
    在 Vercel 项目设置中添加以下环境变量：
 
+   **必需的环境变量：**
    ```
    DATABASE_URL=mysql://user:password@host:3306/database
    NEXTAUTH_URL=https://your-domain.vercel.app
    NEXTAUTH_SECRET=your-generated-secret
    ```
 
-   生成 NEXTAUTH_SECRET:
+   **可选的环境变量（用于数据采集功能）：**
+   ```
+   GITHUB_TOKEN=your-github-token
+   PRODUCTHUNT_API_TOKEN=your-producthunt-token
+   CRON_SECRET=your-cron-secret
+   ```
+
+   生成 NEXTAUTH_SECRET 和 CRON_SECRET:
    ```bash
    openssl rand -base64 32
    ```
+
+   获取 API Tokens:
+   - GitHub Token: https://github.com/settings/tokens (无需特殊权限)
+   - Product Hunt Token: https://www.producthunt.com/v2/oauth/applications
 
 4. **部署**
    - Vercel 会自动检测 Next.js 项目
@@ -134,3 +146,41 @@ A: 确保使用 Next.js App Router，所有 API 在 src/app/api 目录
 - Vercel Dashboard 查看部署日志
 - 使用 Vercel Analytics 监控性能
 - 配置错误追踪（Sentry）
+
+### 数据采集功能
+
+本项目支持自动采集 GitHub Stars 和 Product Hunt 投票数等排名数据。
+
+#### 本地手动更新数据
+
+```bash
+# 更新 GitHub Stars 数据
+npm run update:github
+
+# 更新 Product Hunt 投票数据
+npm run update:producthunt
+
+# 一次更新所有数据
+npm run update:all
+```
+
+#### 自动定时任务（Vercel Cron Jobs）
+
+项目已配置 Vercel Cron Jobs，每天凌晨 2 点（UTC时间）自动更新排名数据。
+
+**配置说明：**
+1. `vercel.json` 中已配置定时任务
+2. 定时任务调用 `/api/cron/update-metrics` 端点
+3. 需要在 Vercel 环境变量中设置 `CRON_SECRET` 以保护端点
+
+**手动触发定时任务：**
+```bash
+curl -X GET https://your-domain.vercel.app/api/cron/update-metrics \
+  -H "Authorization: Bearer your-cron-secret"
+```
+
+**注意事项：**
+- GitHub API 有速率限制（无 token: 60次/小时，有 token: 5000次/小时）
+- Product Hunt API 需要申请 API Token
+- 建议配置 GITHUB_TOKEN 以提高限制
+- 定时任务会自动处理 API 限制和错误

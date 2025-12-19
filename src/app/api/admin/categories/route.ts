@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkAdminPermission } from '@/lib/admin';
+import { randomUUID } from 'crypto';
 
 // 获取所有分类
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
+    const categories = await prisma.categories.findMany({
       orderBy: { order: 'asc' },
       include: {
         _count: {
@@ -23,6 +30,11 @@ export async function GET() {
 // 创建分类
 export async function POST(request: NextRequest) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { name, slug, description, icon, order } = body;
 
@@ -35,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查 slug 是否已存在
-    const existing = await prisma.category.findUnique({
+    const existing = await prisma.categories.findUnique({
       where: { slug },
     });
 
@@ -47,13 +59,15 @@ export async function POST(request: NextRequest) {
     }
 
     // 创建分类
-    const category = await prisma.category.create({
+    const category = await prisma.categories.create({
       data: {
+        id: randomUUID(),
         name,
         slug,
         description,
         icon,
         order: order || 0,
+        updatedAt: new Date(),
       },
     });
 

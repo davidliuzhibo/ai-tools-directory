@@ -7,11 +7,11 @@ interface ToolPageProps {
 }
 
 async function getToolData(slug: string) {
-  const tool = await prisma.tool.findUnique({
+  const tool = await prisma.tools.findUnique({
     where: { slug },
     include: {
-      category: true,
-      rankingMetrics: true,
+      categories: true,
+      ranking_metrics: true,
     },
   });
 
@@ -46,7 +46,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
 }
 
 export async function generateStaticParams() {
-  const tools = await prisma.tool.findMany({
+  const tools = await prisma.tools.findMany({
     where: { isPublished: true },
     select: { slug: true },
   });

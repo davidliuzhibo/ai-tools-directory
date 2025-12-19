@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkAdminPermission } from '@/lib/admin';
 
 // 更新分类
 export async function PUT(
@@ -7,6 +8,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const { id } = params;
     const body = await request.json();
     const { name, slug, description, icon, order } = body;
@@ -20,7 +26,7 @@ export async function PUT(
     }
 
     // 检查分类是否存在
-    const existing = await prisma.category.findUnique({
+    const existing = await prisma.categories.findUnique({
       where: { id },
     });
 
@@ -30,7 +36,7 @@ export async function PUT(
 
     // 如果修改了 slug，检查新 slug 是否已被使用
     if (slug !== existing.slug) {
-      const slugExists = await prisma.category.findUnique({
+      const slugExists = await prisma.categories.findUnique({
         where: { slug },
       });
 
@@ -43,7 +49,7 @@ export async function PUT(
     }
 
     // 更新分类
-    const category = await prisma.category.update({
+    const category = await prisma.categories.update({
       where: { id },
       data: {
         name,
@@ -67,10 +73,15 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const { id } = params;
 
     // 检查分类下是否有工具
-    const toolCount = await prisma.tool.count({
+    const toolCount = await prisma.tools.count({
       where: { categoryId: id },
     });
 
@@ -82,7 +93,7 @@ export async function DELETE(
     }
 
     // 删除分类
-    await prisma.category.delete({
+    await prisma.categories.delete({
       where: { id },
     });
 

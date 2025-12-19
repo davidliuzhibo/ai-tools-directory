@@ -14,16 +14,16 @@ export async function GET(request: NextRequest) {
     };
 
     if (categorySlug) {
-      where.category = {
+      where.categories = {
         slug: categorySlug,
       };
     }
 
     const [tools, total] = await Promise.all([
-      prisma.tool.findMany({
+      prisma.tools.findMany({
         where,
         include: {
-          category: {
+          categories: {
             select: {
               name: true,
               slug: true,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.tool.count({ where }),
+      prisma.tools.count({ where }),
     ]);
 
     return NextResponse.json({

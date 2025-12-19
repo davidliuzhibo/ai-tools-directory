@@ -18,7 +18,7 @@ export async function DELETE(
     const { id } = params;
 
     // 检查评论是否存在
-    const comment = await prisma.comment.findUnique({
+    const comment = await prisma.comments.findUnique({
       where: { id },
     });
 
@@ -32,7 +32,7 @@ export async function DELETE(
     }
 
     // 删除评论（会级联删除回复）
-    await prisma.comment.delete({
+    await prisma.comments.delete({
       where: { id },
     });
 

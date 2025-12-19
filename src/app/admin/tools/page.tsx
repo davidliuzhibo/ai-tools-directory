@@ -89,7 +89,7 @@ export default function AdminToolsPage() {
     setModalVisible(true);
   };
 
-  const handleEdit = (tool: Tool) => {
+  const handleEdit = (tools: Tool) => {
     setEditingTool(tool);
     form.setFieldsValue({
       ...tool,

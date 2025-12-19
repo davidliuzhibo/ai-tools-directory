@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,135 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 工具分类表
-model Category {
-  id          String   @id @default(cuid())
-  name        String   @unique // 分类名称：语言、画图、编程等
-  slug        String   @unique // URL友好的标识符
-  description String?  @db.Text // 分类描述
-  icon        String?  // 图标URL或emoji
-  order       Int      @default(0) // 显示顺序
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  tools     Tool[]     @relation("CategoryTools")
-  useCases  UseCase[]  @relation("CategoryUseCases")
-
-  @@map("categories")
-}
-
-// AI工具表
-model Tool {
-  id                   String   @id @default(cuid())
-  name                 String   // 工具名称
-  slug                 String   @unique // URL标识符
-  description          String?  @db.Text // 简短描述
-  fullDescription      String?  @db.LongText // 完整描述
-  logoUrl              String?  // Logo图片URL
-  websiteUrl           String?  // 官网链接
-
-  // 团队来源
-  teamOrigin           TeamOrigin @default(OVERSEAS) // 国内/出海/海外
-
-  // 平台支持 (JSON格式)
-  platformAvailability Json? // {pc: true, ios: true, android: false, web: true}
-
-  // 定价信息
-  pricingType          PricingType @default(FREEMIUM) // 免费/付费/Freemium
-  pricingDetails       String?  @db.Text // 具体定价信息
-
-  // 排名相关
-  rankingScore         Float    @default(0) // 综合排名分数
-  isPublished          Boolean  @default(true) // 是否发布
-  isFeatured           Boolean  @default(false) // 是否推荐
-
-  // 分类
-  categoryId           String
-  category             Category @relation("CategoryTools", fields: [categoryId], references: [id])
-
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  rankingMetrics       RankingMetrics?
-  favorites            Favorite[]
-  comments             Comment[]
-
-  @@index([categoryId])
-  @@index([rankingScore])
-  @@map("tools")
-}
-
-// 排名指标表
-model RankingMetrics {
-  id                  String   @id @default(cuid())
-  toolId              String   @unique
-  tool                Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
-
-  // 各项指标
-  githubStars         Int      @default(0)
-  githubUrl           String?
-  productHuntVotes    Int      @default(0)
-  productHuntUrl      String?
-  appStoreRating      Float    @default(0) // 0-5分
-  appStoreUrl         String?
-  monthlyActiveUsers  Int      @default(0) // 估算月活
-
-  lastUpdated         DateTime @default(now())
-
-  @@map("ranking_metrics")
-}
-
-// 使用案例表
-model UseCase {
-  id              String   @id @default(cuid())
-  title           String   // 案例标题
-  description     String?  @db.Text // 案例描述
-
-  // 内容类型和链接
-  contentType     ContentType // text/image/video
-  contentUrl      String?  // 内容URL（图片或视频链接）
-  thumbnailUrl    String?  // 缩略图
-  textContent     String?  @db.LongText // 文字内容
-
-  // 关联
-  categoryId      String
-  category        Category @relation("CategoryUseCases", fields: [categoryId], references: [id])
-
-  // 可选：关联具体工具
-  relatedToolIds  Json? // 关联的工具ID数组
-
-  order           Int      @default(0) // 显示顺序
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([categoryId])
-  @@map("use_cases")
-}
-
-// 用户表 (for NextAuth)
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String? // 如果使用邮箱密码登录
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts      Account[]
-  sessions      Session[]
-  favorites     Favorite[]
-  comments      Comment[]
-  admin         Admin?
-
-  @@map("users")
-}
-
-// NextAuth Account
-model Account {
-  id                String  @id @default(cuid())
+model accounts {
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -150,93 +20,167 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users             users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@map("accounts")
+  @@index([userId], map: "accounts_userId_fkey")
 }
 
-// NextAuth Session
-model Session {
-  id           String   @id @default(cuid())
+model admins {
+  id     String      @id
+  userId String      @unique
+  role   admins_role @default(EDITOR)
+  users  users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model categories {
+  id          String      @id
+  name        String      @unique
+  slug        String      @unique
+  description String?     @db.Text
+  icon        String?
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime
+  tools       tools[]
+  use_cases   use_cases[]
+}
+
+model comments {
+  id             String     @id
+  content        String     @db.Text
+  userId         String
+  toolId         String
+  parentId       String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime
+  comments       comments?  @relation("commentsTocomments", fields: [parentId], references: [id], onDelete: Cascade)
+  other_comments comments[] @relation("commentsTocomments")
+  tools          tools      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  users          users      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@index([toolId])
+  @@index([userId])
+}
+
+model favorites {
+  id        String   @id
+  userId    String
+  toolId    String
+  createdAt DateTime @default(now())
+  tools     tools    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolId])
+  @@index([toolId])
+  @@index([userId])
+}
+
+model ranking_metrics {
+  id                 String   @id
+  toolId             String   @unique
+  githubStars        Int      @default(0)
+  githubUrl          String?
+  productHuntVotes   Int      @default(0)
+  productHuntUrl     String?
+  appStoreRating     Float    @default(0)
+  appStoreUrl        String?
+  monthlyActiveUsers Int      @default(0)
+  lastUpdated        DateTime @default(now())
+  tools              tools    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+}
+
+model sessions {
+  id           String   @id
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions")
+  @@index([userId], map: "sessions_userId_fkey")
 }
 
-// 收藏表
-model Favorite {
-  id        String   @id @default(cuid())
-  userId    String
-  toolId    String
-  createdAt DateTime @default(now())
+model tools {
+  id                   String            @id
+  name                 String
+  slug                 String            @unique
+  description          String?           @db.Text
+  fullDescription      String?           @db.LongText
+  logoUrl              String?
+  websiteUrl           String?
+  teamOrigin           tools_teamOrigin  @default(OVERSEAS)
+  platformAvailability Json?
+  pricingType          tools_pricingType @default(FREEMIUM)
+  pricingDetails       String?           @db.Text
+  rankingScore         Float             @default(0)
+  isPublished          Boolean           @default(true)
+  isFeatured           Boolean           @default(false)
+  categoryId           String
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime
+  comments             comments[]
+  favorites            favorites[]
+  ranking_metrics      ranking_metrics?
+  categories           categories        @relation(fields: [categoryId], references: [id])
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tool Tool @relation(fields: [toolId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, toolId])
-  @@index([userId])
-  @@index([toolId])
-  @@map("favorites")
+  @@index([categoryId])
+  @@index([rankingScore])
 }
 
-// 评论表
-model Comment {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  userId    String
-  toolId    String
-  parentId  String?  // 用于回复功能
+model use_cases {
+  id             String                @id
+  title          String
+  description    String?               @db.Text
+  contentType    use_cases_contentType
+  contentUrl     String?
+  thumbnailUrl   String?
+  textContent    String?               @db.LongText
+  categoryId     String
+  relatedToolIds Json?
+  order          Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime
+  categories     categories            @relation(fields: [categoryId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tool     Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies  Comment[] @relation("CommentReplies")
-
-  @@index([userId])
-  @@index([toolId])
-  @@index([parentId])
-  @@map("comments")
+  @@index([categoryId])
 }
 
-// 管理员表
-model Admin {
-  id     String @id @default(cuid())
-  userId String @unique
-  role   AdminRole @default(EDITOR)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("admins")
+model users {
+  id            String      @id
+  name          String?
+  email         String      @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime
+  accounts      accounts[]
+  admins        admins?
+  comments      comments[]
+  favorites     favorites[]
+  sessions      sessions[]
 }
 
-// 枚举类型
-enum TeamOrigin {
-  DOMESTIC  // 国内团队
-  OUTBOUND  // 出海团队
-  OVERSEAS  // 海外团队
+enum admins_role {
+  ADMIN
+  EDITOR
 }
 
-enum PricingType {
-  FREE      // 完全免费
-  PAID      // 完全付费
-  FREEMIUM  // 免费+付费
-}
-
-enum ContentType {
+enum use_cases_contentType {
   TEXT
   IMAGE
   VIDEO
 }
 
-enum AdminRole {
-  ADMIN
-  EDITOR
+enum tools_teamOrigin {
+  DOMESTIC
+  OUTBOUND
+  OVERSEAS
+}
+
+enum tools_pricingType {
+  FREE
+  PAID
+  FREEMIUM
 }

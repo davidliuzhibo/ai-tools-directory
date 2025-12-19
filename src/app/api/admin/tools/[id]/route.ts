@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkAdminPermission } from '@/lib/admin';
 
 // 获取单个工具
 export async function GET(
@@ -7,12 +8,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const { id } = await params;
-    const tool = await prisma.tool.findUnique({
+    const tool = await prisma.tools.findUnique({
       where: { id },
       include: {
-        category: true,
-        rankingMetrics: true,
+        categories: true,
+        ranking_metrics: true,
       },
     });
 
@@ -39,10 +45,15 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const { id } = await params;
     const body = await request.json();
 
-    const tool = await prisma.tool.update({
+    const tool = await prisma.tools.update({
       where: { id },
       data: {
         name: body.name,
@@ -78,9 +89,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await checkAdminPermission();
+    if (!session) {
+      return NextResponse.json({ error: '无权限访问' }, { status: 403 });
+    }
+
     const { id } = await params;
 
-    await prisma.tool.delete({
+    await prisma.tools.delete({
       where: { id },
     });
 
