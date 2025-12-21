@@ -52,10 +52,15 @@ async function main() {
   ];
 
   for (const category of categories) {
-    await prisma.category.upsert({
+    await prisma.categories.upsert({
       where: { slug: category.slug },
       update: category,
-      create: category,
+      create: {
+        id: `cat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        ...category,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     });
     console.log(`✓ 创建分类: ${category.name}`);
   }

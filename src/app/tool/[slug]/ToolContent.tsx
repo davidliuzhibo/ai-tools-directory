@@ -10,11 +10,14 @@ import {
   WindowsOutlined,
   AndroidOutlined,
   GlobalOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import Image from 'next/image';
 import FavoriteButton from '@/components/tool/FavoriteButton';
 import CommentSection from '@/components/tool/CommentSection';
+import UseCaseList from '@/components/use-case/UseCaseList';
+import { addToCompare } from '@/components/tool/CompareButton';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -62,6 +65,15 @@ interface ToolContentProps {
 
 export default function ToolContent({ tool }: ToolContentProps) {
   const platformAvailability = tool.platformAvailability as any;
+
+  const handleAddToCompare = () => {
+    addToCompare({
+      id: tool.id,
+      name: tool.name,
+      slug: tool.slug,
+      logoUrl: tool.logoUrl,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -181,6 +193,9 @@ export default function ToolContent({ tool }: ToolContentProps) {
                     </Button>
                   </a>
                 )}
+                <Button size="large" icon={<SwapOutlined />} onClick={handleAddToCompare}>
+                  加入对比
+                </Button>
                 <FavoriteButton toolId={tool.id} />
               </div>
             </div>
@@ -263,6 +278,13 @@ export default function ToolContent({ tool }: ToolContentProps) {
             </Card>
           </Col>
         </Row>
+
+        {/* Use Cases Section */}
+        <div className="mt-8">
+          <Card title="使用案例" className="mb-6">
+            <UseCaseList toolId={tool.id} limit={3} />
+          </Card>
+        </div>
 
         {/* Comment Section */}
         <CommentSection toolId={tool.id} />

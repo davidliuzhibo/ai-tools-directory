@@ -33,13 +33,14 @@ export default function SearchPage() {
   const [category, setCategory] = useState<string>('all');
   const [pricingType, setPricingType] = useState<string>('all');
   const [teamOrigin, setTeamOrigin] = useState<string>('all');
+  const [platform, setPlatform] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('rankingScore');
 
   useEffect(() => {
     if (initialQuery) {
       performSearch(initialQuery);
     }
-  }, [initialQuery, category, pricingType, teamOrigin, sortBy]);
+  }, [initialQuery, category, pricingType, teamOrigin, platform, sortBy]);
 
   const performSearch = async (searchQuery: string) => {
     setLoading(true);
@@ -49,6 +50,7 @@ export default function SearchPage() {
         ...(category !== 'all' && { category }),
         ...(pricingType !== 'all' && { pricing: pricingType }),
         ...(teamOrigin !== 'all' && { team: teamOrigin }),
+        ...(platform !== 'all' && { platform }),
         sortBy,
       });
 
@@ -167,6 +169,22 @@ export default function SearchPage() {
                     { value: 'DOMESTIC', label: '国内团队' },
                     { value: 'OUTBOUND', label: '出海团队' },
                     { value: 'OVERSEAS', label: '海外团队' },
+                  ]}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary" className="mr-2">平台:</Text>
+                <Select
+                  value={platform}
+                  onChange={setPlatform}
+                  style={{ width: 150 }}
+                  options={[
+                    { value: 'all', label: '全部' },
+                    { value: 'pc', label: '💻 PC' },
+                    { value: 'ios', label: '🍎 iOS' },
+                    { value: 'android', label: '🤖 Android' },
+                    { value: 'web', label: '🌐 Web' },
                   ]}
                 />
               </div>

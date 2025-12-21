@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 // 删除评论
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ export async function DELETE(
       return NextResponse.json({ error: '未登录' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // 检查评论是否存在
     const comment = await prisma.comments.findUnique({

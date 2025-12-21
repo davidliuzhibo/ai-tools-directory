@@ -6,7 +6,7 @@ async function addMoreTools() {
   console.log('开始添加更多示例工具数据...\n');
 
   // 获取所有分类
-  const categories = await prisma.category.findMany();
+  const categories = await prisma.categories.findMany();
   const categoryMap = new Map(categories.map(c => [c.slug, c.id]));
 
   const moreTools = [
@@ -218,7 +218,7 @@ async function addMoreTools() {
     }
 
     try {
-      const tool = await prisma.tool.upsert({
+      const tool = await prisma.tools.upsert({
         where: { slug: toolData.slug },
         update: {
           name: toolData.name,
@@ -228,8 +228,10 @@ async function addMoreTools() {
           pricingType: toolData.pricingType as any,
           rankingScore: toolData.rankingScore,
           platformAvailability: toolData.platformAvailability,
+          updatedAt: new Date(),
         },
         create: {
+          id: `tool_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
           name: toolData.name,
           slug: toolData.slug,
           description: toolData.description,
@@ -239,6 +241,8 @@ async function addMoreTools() {
           rankingScore: toolData.rankingScore,
           platformAvailability: toolData.platformAvailability,
           categoryId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -249,7 +253,7 @@ async function addMoreTools() {
   }
 
   // 统计数据
-  const totalTools = await prisma.tool.count();
+  const totalTools = await prisma.tools.count();
   console.log(`\n总计工具数: ${totalTools}`);
 
   console.log('\n更多数据添加完成!');

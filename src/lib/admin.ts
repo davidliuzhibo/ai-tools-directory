@@ -24,3 +24,16 @@ export async function checkAdminPermission() {
 
   return session;
 }
+
+/**
+ * 检查指定用户ID是否为管理员
+ * @param userId - 用户ID
+ * @returns 如果是管理员返回 true，否则返回 false
+ */
+export async function isAdmin(userId: string): Promise<boolean> {
+  const admin = await prisma.admins.findUnique({
+    where: { userId },
+  });
+
+  return !!admin;
+}

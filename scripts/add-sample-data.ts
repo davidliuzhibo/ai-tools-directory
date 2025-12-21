@@ -6,7 +6,7 @@ async function addSampleTools() {
   console.log('开始添加示例工具数据...\n');
 
   // 获取所有分类
-  const categories = await prisma.category.findMany();
+  const categories = await prisma.categories.findMany();
   const categoryMap = new Map(categories.map(c => [c.slug, c.id]));
 
   const tools = [
@@ -207,7 +207,7 @@ async function addSampleTools() {
     }
 
     try {
-      const tool = await prisma.tool.upsert({
+      const tool = await prisma.tools.upsert({
         where: { slug: toolData.slug },
         update: {
           name: toolData.name,

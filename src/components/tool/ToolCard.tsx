@@ -1,9 +1,10 @@
 'use client';
 
 import { Card, Tag, Button, Tooltip } from 'antd';
-import { StarOutlined, LinkOutlined, AppleOutlined, WindowsOutlined, AndroidOutlined, GlobalOutlined } from '@ant-design/icons';
+import { StarOutlined, LinkOutlined, AppleOutlined, WindowsOutlined, AndroidOutlined, GlobalOutlined, SwapOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import Link from 'next/link';
+import { addToCompare } from './CompareButton';
 
 interface ToolCardProps {
   id: string;
@@ -47,6 +48,11 @@ export default function ToolCard({
   rankingScore,
   platformAvailability,
 }: ToolCardProps) {
+  const handleAddToCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCompare({ id, name, slug, logoUrl });
+  };
+
   return (
     <Card
       hoverable
@@ -131,6 +137,9 @@ export default function ToolCard({
               查看详情
             </Button>
           </Link>
+          <Tooltip title="加入对比">
+            <Button icon={<SwapOutlined />} onClick={handleAddToCompare} />
+          </Tooltip>
           {websiteUrl && (
             <a
               href={websiteUrl}

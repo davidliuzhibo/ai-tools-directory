@@ -9,6 +9,7 @@ import {
   UserOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +40,11 @@ export default function AdminLayout({
       key: '/admin/categories',
       icon: <AppstoreOutlined />,
       label: <Link href="/admin/categories">分类管理</Link>,
+    },
+    {
+      key: '/admin/use-cases',
+      icon: <FileTextOutlined />,
+      label: <Link href="/admin/use-cases">使用案例</Link>,
     },
     {
       key: '/admin/users',

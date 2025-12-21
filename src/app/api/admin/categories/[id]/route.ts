@@ -5,7 +5,7 @@ import { checkAdminPermission } from '@/lib/admin';
 // 更新分类
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await checkAdminPermission();
@@ -13,7 +13,7 @@ export async function PUT(
       return NextResponse.json({ error: '无权限访问' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, slug, description, icon, order } = body;
 
@@ -70,7 +70,7 @@ export async function PUT(
 // 删除分类
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await checkAdminPermission();
@@ -78,7 +78,7 @@ export async function DELETE(
       return NextResponse.json({ error: '无权限访问' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // 检查分类下是否有工具
     const toolCount = await prisma.tools.count({

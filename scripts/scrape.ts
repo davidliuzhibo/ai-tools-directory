@@ -78,7 +78,7 @@ async function scrapeAndSave() {
     console.log(`\n处理分类: ${category.categorySlug}`);
 
     // 获取分类
-    const dbCategory = await prisma.category.findUnique({
+    const dbCategory = await prisma.categories.findUnique({
       where: { slug: category.categorySlug },
     });
 
@@ -111,7 +111,7 @@ async function scrapeAndSave() {
         });
 
         // 保存或更新工具
-        const tool = await prisma.tool.upsert({
+        const tool = await prisma.tools.upsert({
           where: { slug: finalData.slug },
           update: {
             name: finalData.name,

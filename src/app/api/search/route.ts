@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const categorySlug = searchParams.get('category');
     const pricingType = searchParams.get('pricing');
     const teamOrigin = searchParams.get('team');
+    const platform = searchParams.get('platform');
     const sortBy = searchParams.get('sortBy') || 'rankingScore';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -38,6 +39,14 @@ export async function GET(request: NextRequest) {
     // 团队来源筛选
     if (teamOrigin && teamOrigin !== 'all') {
       where.teamOrigin = teamOrigin;
+    }
+
+    // 平台筛选
+    if (platform && platform !== 'all') {
+      where.platformAvailability = {
+        path: `$.${platform}`,
+        equals: true,
+      };
     }
 
     // 排序配置
