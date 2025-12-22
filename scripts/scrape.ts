@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { GitHubScraper } from '../src/lib/scrapers/GitHubScraper';
 import { ProductHuntScraper } from '../src/lib/scrapers/ProductHuntScraper';
 import * as dotenv from 'dotenv';
+import { randomUUID } from 'crypto';
 
 // 加载环境变量
 dotenv.config();
@@ -123,6 +124,7 @@ async function scrapeAndSave() {
             rankingScore,
           },
           create: {
+            id: randomUUID(),
             name: finalData.name,
             slug: finalData.slug,
             description: finalData.description,
@@ -132,6 +134,7 @@ async function scrapeAndSave() {
             pricingType: finalData.pricingType,
             rankingScore,
             categoryId: dbCategory.id,
+            updatedAt: new Date(),
           },
         });
 
@@ -139,7 +142,7 @@ async function scrapeAndSave() {
 
         // 保存排名指标
         if (githubData) {
-          await prisma.rankingMetrics.upsert({
+          await prisma.ranking_metrics.upsert({
             where: { toolId: tool.id },
             update: {
               githubStars: githubData.githubStars || 0,
@@ -147,6 +150,7 @@ async function scrapeAndSave() {
               lastUpdated: new Date(),
             },
             create: {
+              id: randomUUID(),
               toolId: tool.id,
               githubStars: githubData.githubStars || 0,
               githubUrl: githubData.githubUrl,

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -219,6 +220,7 @@ async function addSampleTools() {
           platformAvailability: toolData.platformAvailability,
         },
         create: {
+          id: randomUUID(),
           name: toolData.name,
           slug: toolData.slug,
           description: toolData.description,
@@ -228,6 +230,7 @@ async function addSampleTools() {
           rankingScore: toolData.rankingScore,
           platformAvailability: toolData.platformAvailability,
           categoryId,
+          updatedAt: new Date(),
         },
       });
 

@@ -87,6 +87,9 @@ model ranking_metrics {
   appStoreRating     Float    @default(0)
   appStoreUrl        String?
   monthlyActiveUsers Int      @default(0)
+  waytoagiRanking    Int?
+  waytoagiUrl        String?
+  aiProductRanking   Int?
   lastUpdated        DateTime @default(now())
   tools              tools    @relation(fields: [toolId], references: [id], onDelete: Cascade)
 }
@@ -116,6 +119,7 @@ model tools {
   rankingScore         Float             @default(0)
   isPublished          Boolean           @default(true)
   isFeatured           Boolean           @default(false)
+  dataSource           String?           @default("MANUAL")
   categoryId           String
   createdAt            DateTime          @default(now())
   updatedAt            DateTime

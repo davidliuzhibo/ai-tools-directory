@@ -16,7 +16,7 @@ export async function GET() {
         queryTest: result,
         userCount,
         prismaExists: !!prisma,
-        prismaUserExists: !!prisma.user,
+        prismaUsersExists: !!prisma.users,
       },
     });
   } catch (error) {

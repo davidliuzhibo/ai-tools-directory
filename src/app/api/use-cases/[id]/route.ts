@@ -30,7 +30,7 @@ export async function GET(
     }
 
     // 如果有关联工具，获取工具信息
-    let relatedTools = [];
+    let relatedTools: any[] = [];
     if (useCase.relatedToolIds) {
       const toolIds = useCase.relatedToolIds as string[];
       relatedTools = await prisma.tools.findMany({

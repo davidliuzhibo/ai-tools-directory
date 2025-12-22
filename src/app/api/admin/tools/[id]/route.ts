@@ -68,8 +68,10 @@ export async function PUT(
         rankingScore: body.rankingScore,
         platformAvailability: body.platformAvailability,
         categoryId: body.categoryId,
+        dataSource: body.dataSource,
         isPublished: body.isPublished,
         isFeatured: body.isFeatured,
+        updatedAt: new Date(),
       },
     });
 

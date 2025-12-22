@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ToolPageProps) {
   }
 
   return {
-    title: `${tool.name} - ${tool.category.name}类AI工具`,
+    title: `${tool.name} - ${tool.categories.name}类AI工具`,
     description: tool.description || `${tool.name} - 发现并使用最好的AI工具`,
   };
 }

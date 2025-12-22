@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // 分类筛选
     if (categorySlug && categorySlug !== 'all') {
-      where.category = {
+      where.categories = {
         slug: categorySlug,
       };
     }
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const tools = await prisma.tools.findMany({
       where,
       include: {
-        category: {
+        categories: {
           select: {
             name: true,
             slug: true,

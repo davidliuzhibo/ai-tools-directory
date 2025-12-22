@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
             image: true,
           },
         },
-        replies: {
+        other_comments: {
           include: {
             users: {
               select: {

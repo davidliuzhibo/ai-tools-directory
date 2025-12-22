@@ -44,6 +44,7 @@ interface Tool {
   rankingScore: number;
   isPublished: boolean;
   isFeatured: boolean;
+  dataSource: string | null;
   category: Category;
 }
 
@@ -89,7 +90,7 @@ export default function AdminToolsPage() {
     setModalVisible(true);
   };
 
-  const handleEdit = (tools: Tool) => {
+  const handleEdit = (tool: Tool) => {
     setEditingTool(tool);
     form.setFieldsValue({
       ...tool,
@@ -159,6 +160,21 @@ export default function AdminToolsPage() {
       dataIndex: ['category', 'name'],
       key: 'category',
       width: 100,
+    },
+    {
+      title: '数据来源',
+      dataIndex: 'dataSource',
+      key: 'dataSource',
+      width: 100,
+      render: (value: string | null) => {
+        const sourceMap: any = {
+          MANUAL: { text: '手动', color: 'blue' },
+          WAYTOAGI: { text: 'WaytoAGI', color: 'green' },
+          SCRAPER: { text: '爬虫', color: 'orange' },
+        };
+        const source = sourceMap[value || 'MANUAL'] || sourceMap.MANUAL;
+        return <Tag color={source.color}>{source.text}</Tag>;
+      },
     },
     {
       title: '团队',
@@ -313,6 +329,18 @@ export default function AdminToolsPage() {
               <Select.Option value="DOMESTIC">国内团队</Select.Option>
               <Select.Option value="OUTBOUND">出海团队</Select.Option>
               <Select.Option value="OVERSEAS">海外团队</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="dataSource"
+            label="数据来源"
+            initialValue="MANUAL"
+          >
+            <Select>
+              <Select.Option value="MANUAL">手动添加</Select.Option>
+              <Select.Option value="WAYTOAGI">WaytoAGI导入</Select.Option>
+              <Select.Option value="SCRAPER">爬虫采集</Select.Option>
             </Select>
           </Form.Item>
 

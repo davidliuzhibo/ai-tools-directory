@@ -21,7 +21,13 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(tools);
+    // 格式化数据，将 categories 重命名为 category
+    const formattedTools = tools.map((tool) => ({
+      ...tool,
+      category: tool.categories,
+    }));
+
+    return NextResponse.json(formattedTools);
   } catch (error) {
     console.error('获取工具列表失败:', error);
     return NextResponse.json(
@@ -56,6 +62,7 @@ export async function POST(request: NextRequest) {
         rankingScore: body.rankingScore || 0,
         platformAvailability: body.platformAvailability,
         categoryId: body.categoryId,
+        dataSource: body.dataSource || 'MANUAL',
         isPublished: body.isPublished ?? true,
         isFeatured: body.isFeatured ?? false,
         updatedAt: new Date(),

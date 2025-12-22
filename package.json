@@ -15,7 +15,9 @@
     "scrape": "ts-node --project tsconfig.node.json scripts/scrape.ts",
     "update:github": "ts-node --project tsconfig.node.json scripts/update-github-stars.ts",
     "update:producthunt": "ts-node --project tsconfig.node.json scripts/update-producthunt-votes.ts",
-    "update:all": "npm run update:github && npm run update:producthunt"
+    "update:all": "npm run update:github && npm run update:producthunt",
+    "import:waytoagi": "ts-node --project tsconfig.node.json scripts/import-waytoagi.ts",
+    "verify:migration": "ts-node --project tsconfig.node.json scripts/verify-migration.ts"
   },
   "prisma": {
     "seed": "ts-node --project tsconfig.node.json prisma/seed.ts"

@@ -224,13 +224,11 @@ export default function UseCaseContent({ useCase, relatedTools }: UseCaseContent
                           </Text>
                           <div className="flex gap-1 mt-1">
                             <Tag
-                              size="small"
                               color={pricingTypeMap[tool.pricingType as keyof typeof pricingTypeMap]?.color}
                             >
                               {pricingTypeMap[tool.pricingType as keyof typeof pricingTypeMap]?.label}
                             </Tag>
                             <Tag
-                              size="small"
                               color={teamOriginMap[tool.teamOrigin as keyof typeof teamOriginMap]?.color}
                             >
                               {teamOriginMap[tool.teamOrigin as keyof typeof teamOriginMap]?.label}

@@ -34,7 +34,7 @@ const pricingTypeMap = {
 };
 
 interface ToolContentProps {
-  tools: {
+  tool: {
     id: string;
     name: string;
     slug: string;
@@ -47,7 +47,7 @@ interface ToolContentProps {
     pricingDetails: string | null;
     rankingScore: number;
     platformAvailability: any;
-    category: {
+    categories: {
       id: string;
       name: string;
       slug: string;
@@ -90,7 +90,7 @@ export default function ToolContent({ tool }: ToolContentProps) {
                 ),
               },
               {
-                title: <Link href={`/category/${tool.category.slug}`}>{tool.category.name}</Link>,
+                title: <Link href={`/category/${tool.categories.slug}`}>{tool.categories.name}</Link>,
               },
               {
                 title: tool.name,
@@ -127,7 +127,7 @@ export default function ToolContent({ tool }: ToolContentProps) {
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
-                <Tag color={tool.category.icon}>{tool.category.icon} {tool.category.name}</Tag>
+                <Tag color="blue">{tool.categories.icon} {tool.categories.name}</Tag>
                 <Tag color={teamOriginMap[tool.teamOrigin].color}>
                   {teamOriginMap[tool.teamOrigin].label}
                 </Tag>
@@ -263,14 +263,14 @@ export default function ToolContent({ tool }: ToolContentProps) {
 
             {/* Category */}
             <Card title="所属分类">
-              <Link href={`/category/${tool.category.slug}`}>
+              <Link href={`/category/${tool.categories.slug}`}>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="text-3xl">{tool.category.icon}</div>
+                  <div className="text-3xl">{tool.categories.icon}</div>
                   <div>
-                    <Text strong>{tool.category.name}</Text>
+                    <Text strong>{tool.categories.name}</Text>
                     <br />
                     <Text type="secondary" className="text-sm">
-                      {tool.category.description}
+                      {tool.categories.description}
                     </Text>
                   </div>
                 </div>

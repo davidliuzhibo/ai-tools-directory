@@ -24,7 +24,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ id: st
   }
 
   // 获取关联工具
-  let relatedTools = [];
+  let relatedTools: any[] = [];
   if (useCase.relatedToolIds) {
     const toolIds = useCase.relatedToolIds as string[];
     relatedTools = await prisma.tools.findMany({

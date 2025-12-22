@@ -72,7 +72,7 @@ export default function FavoritesPage() {
           <Row gutter={[24, 24]}>
             {favorites.map((favorite) => (
               <Col xs={24} sm={12} lg={8} xl={6} key={favorite.id}>
-                <ToolCard tool={favorite.tool} />
+                <ToolCard {...favorite.tools} />
               </Col>
             ))}
           </Row>
