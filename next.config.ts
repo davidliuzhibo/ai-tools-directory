@@ -13,6 +13,9 @@ const nextConfig = {
     ],
   },
 
+  // Docker 部署配置
+  output: 'standalone',
+
   // 实验性功能
   experimental: {
     serverActions: {

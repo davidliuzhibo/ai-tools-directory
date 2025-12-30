@@ -36,3 +36,25 @@ next-env.d.ts
 # editor
 .vscode
 .idea
+
+# 数据文件（不上传到 GitHub）
+/data
+*.sql
+/backup
+
+# Docker 环境变量（包含密码，不要上传！）
+.env.docker
+
+# 调试文件
+debug-*.png
+*.log
+
+# SSL 证书（敏感文件）
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
+
+# 临时文件
+*.tmp
+*.temp
+.cache

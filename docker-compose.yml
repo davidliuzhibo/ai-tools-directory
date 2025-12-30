@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: aitools-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-aitools}
+      MYSQL_USER: ${MYSQL_USER:-aitools_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-aitools_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - aitools-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Next.js 应用
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aitools-web
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=mysql://${MYSQL_USER:-aitools_user}:${MYSQL_PASSWORD:-aitools_password}@mysql:3306/${MYSQL_DATABASE:-aitools}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PRODUCTHUNT_API_TOKEN=${PRODUCTHUNT_API_TOKEN}
+      - COS_SECRET_ID=${COS_SECRET_ID}
+      - COS_SECRET_KEY=${COS_SECRET_KEY}
+      - COS_BUCKET=${COS_BUCKET}
+      - COS_REGION=${COS_REGION}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - CRON_SECRET=${CRON_SECRET}
+    ports:
+      - "3000:3000"
+    networks:
+      - aitools-network
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: aitools-nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - aitools-network
+
+volumes:
+  mysql_data:
+  nginx_cache:
+
+networks:
+  aitools-network:
+    driver: bridge

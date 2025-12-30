@@ -17,6 +17,8 @@
     "update:producthunt": "ts-node --project tsconfig.node.json scripts/update-producthunt-votes.ts",
     "update:all": "npm run update:github && npm run update:producthunt",
     "import:waytoagi": "ts-node --project tsconfig.node.json scripts/import-waytoagi.ts",
+    "import:csv": "ts-node --project tsconfig.node.json scripts/import-from-csv.ts",
+    "check:data": "ts-node --project tsconfig.node.json scripts/check-data.ts",
     "verify:migration": "ts-node --project tsconfig.node.json scripts/verify-migration.ts"
   },
   "prisma": {

@@ -1,18 +1,19 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button, Dropdown, Avatar, Space } from 'antd';
 import {
   UserOutlined,
   LogoutOutlined,
   HeartOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import type { MenuProps } from 'antd';
 
 export default function UserMenu() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   if (status === 'loading') {
     return (
@@ -35,21 +36,19 @@ export default function UserMenu() {
     );
   }
 
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'logout') {
+      signOut({ callbackUrl: '/' });
+    } else if (key === 'favorites') {
+      router.push('/favorites');
+    }
+  };
+
   const menuItems: MenuProps['items'] = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: <Link href="/profile">个人资料</Link>,
-    },
     {
       key: 'favorites',
       icon: <HeartOutlined />,
-      label: <Link href="/favorites">我的收藏</Link>,
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: <Link href="/settings">设置</Link>,
+      label: '我的收藏',
     },
     {
       type: 'divider',
@@ -59,14 +58,11 @@ export default function UserMenu() {
       icon: <LogoutOutlined />,
       label: '退出登录',
       danger: true,
-      onClick: () => {
-        signOut({ callbackUrl: '/' });
-      },
     },
   ];
 
   return (
-    <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
+    <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} placement="bottomRight" arrow>
       <Space className="cursor-pointer hover:opacity-80 transition-opacity">
         <Avatar
           src={session.user.image}
