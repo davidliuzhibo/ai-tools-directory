@@ -58,3 +58,8 @@ nginx/ssl/*.crt
 *.tmp
 *.temp
 .cache
+
+# 敏感文件和测试文件
+Password.txt
+Screenshots/
+Dockerfile.debian-china

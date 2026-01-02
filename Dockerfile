@@ -1,55 +1,85 @@
-# 阿里云部署 Dockerfile
-FROM node:18-alpine AS base
+  FROM node:20-slim AS base
 
-# 安装依赖阶段
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+  RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+      sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list 2>/dev/null || true
 
-# 复制包管理文件
-COPY package.json package-lock.json* ./
-RUN npm ci
+  FROM base AS deps
+  RUN apt-get update && apt-get install -y \
+        openssl \
+        ca-certificates \
+        && rm -rf /var/lib/apt/lists/*
+  WORKDIR /app
 
-# 构建阶段
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+  ENV PUPPETEER_SKIP_DOWNLOAD=true
+  ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# 生成 Prisma Client
-RUN npx prisma generate
+  COPY package.json package-lock.json* ./
+  RUN npm config set registry https://registry.npmmirror.com && \
+      npm ci
 
-# 构建 Next.js 应用
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+  FROM base AS builder
+  RUN apt-get update && apt-get install -y \
+        openssl \
+        ca-certificates \
+        && rm -rf /var/lib/apt/lists/*
+  WORKDIR /app
+  COPY --from=deps /app/node_modules ./node_modules
+  COPY . .
 
-# 生产运行阶段
-FROM base AS runner
-WORKDIR /app
+  ENV DATABASE_URL="file:./dev.db"
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+  RUN npx prisma generate
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+  ENV NEXT_TELEMETRY_DISABLED=1
+  ENV NODE_OPTIONS="--max-old-space-size=2048"
+  ENV NEXT_SKIP_STATIC_GENERATION=1
+  ENV SKIP_STATIC_GENERATION=true
+  RUN npm run build
 
-# 复制必要文件
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+  FROM base AS runner
+  WORKDIR /app
 
-# 复制启动脚本
-COPY docker-entrypoint.sh /app/
-RUN chmod +x /app/docker-entrypoint.sh
+  RUN apt-get update && apt-get install -y \
+        chromium \
+        openssl \
+        ca-certificates \
+        fonts-liberation \
+        libnss3 \
+        libatk-bridge2.0-0 \
+        libdrm2 \
+        libxkbcommon0 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxfixes3 \
+        libxrandr2 \
+        libgbm1 \
+        libasound2 \
+        && rm -rf /var/lib/apt/lists/*
 
-USER nextjs
+  ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+  ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-EXPOSE 3000
+  ENV NODE_ENV=production
+  ENV NEXT_TELEMETRY_DISABLED=1
 
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+  RUN addgroup --system --gid 1001 nodejs && \
+      adduser --system --uid 1001 nextjs
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["node", "server.js"]
+  COPY --from=builder /app/public ./public
+  COPY --from=builder /app/.next/standalone ./
+  COPY --from=builder /app/.next/static ./.next/static
+  COPY --from=builder /app/prisma ./prisma
+  COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+  COPY docker-entrypoint.sh /app/
+  RUN chmod +x /app/docker-entrypoint.sh
+
+  USER nextjs
+
+  EXPOSE 3000
+
+  ENV PORT=3000
+  ENV HOSTNAME="0.0.0.0"
+
+  ENTRYPOINT ["/app/docker-entrypoint.sh"]
+  CMD ["node", "server.js"]

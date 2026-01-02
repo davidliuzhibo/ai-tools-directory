@@ -45,13 +45,18 @@ export default async function ToolPage({ params }: ToolPageProps) {
   return <ToolContent tool={tool} />;
 }
 
-export async function generateStaticParams() {
-  const tools = await prisma.tools.findMany({
-    where: { isPublished: true },
-    select: { slug: true },
-  });
+  export async function generateStaticParams() {
+    // 在 Docker 构建时跳过静态生成，改为动态渲染
+    if (process.env.SKIP_STATIC_GENERATION === 'true' || !process.env.DATABASE_URL?.includes('mysql://')) {
+      return [];
+    }
 
-  return tools.map((tool) => ({
-    slug: tool.slug,
-  }));
-}
+    const tools = await prisma.tools.findMany({
+      where: { isPublished: true },
+      select: { slug: true },
+    });
+
+    return tools.map((tool) => ({
+      slug: tool.slug,
+    }));
+  }

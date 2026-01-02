@@ -47,12 +47,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   return <CategoryContent category={category} />;
 }
 
-export async function generateStaticParams() {
-  const categories = await prisma.categories.findMany({
-    select: { slug: true },
-  });
+  export async function generateStaticParams() {
+    // 在 Docker 构建时跳过静态生成，改为动态渲染
+    if (process.env.SKIP_STATIC_GENERATION === 'true' || !process.env.DATABASE_URL?.includes('mysql://')) {
+      return [];
+    }
 
-  return categories.map((category) => ({
-    slug: category.slug,
-  }));
-}
+    const categories = await prisma.categories.findMany({
+      select: { slug: true },
+    });
+
+    return categories.map((category) => ({
+      slug: category.slug,
+    }));
+  }

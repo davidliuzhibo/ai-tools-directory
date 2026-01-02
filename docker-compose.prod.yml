@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aitools-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-aitools}
+      MYSQL_USER: ${MYSQL_USER:-aitools_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # 生产环境：不暴露 3306 端口到宿主机，仅在 Docker 网络内访问
+    networks:
+      - aitools-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aitools-web
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PRODUCTHUNT_API_TOKEN=${PRODUCTHUNT_API_TOKEN}
+      - COS_SECRET_ID=${COS_SECRET_ID}
+      - COS_SECRET_KEY=${COS_SECRET_KEY}
+      - COS_BUCKET=${COS_BUCKET}
+      - COS_REGION=${COS_REGION}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - CRON_SECRET=${CRON_SECRET}
+    # 生产环境：不暴露 3000 端口，仅通过 nginx 访问
+    networks:
+      - aitools-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: aitools-nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - aitools-network
+
+volumes:
+  mysql_data:
+  nginx_cache:
+
+networks:
+  aitools-network:
+    driver: bridge
