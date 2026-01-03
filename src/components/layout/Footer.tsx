@@ -98,6 +98,16 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-gray-200 pt-6 pb-4 text-center text-sm text-gray-600">
           <p>© {currentYear} AI工具大全. All rights reserved.</p>
+          <p className="mt-2">
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-blue-600"
+            >
+              京ICP备2025158016号
+            </a>
+          </p>
         </div>
       </div>
     </footer>
