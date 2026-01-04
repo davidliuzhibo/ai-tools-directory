@@ -2,6 +2,11 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import ToolContent from './ToolContent';
 
+// 允许访问未预生成的动态路由
+export const dynamicParams = true;
+// 使用动态渲染
+export const dynamic = 'force-dynamic';
+
 interface ToolPageProps {
   params: Promise<{ slug: string }>;
 }
