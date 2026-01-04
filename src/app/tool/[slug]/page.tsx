@@ -2,10 +2,10 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import ToolContent from './ToolContent';
 
-// 允许访问未预生成的动态路由
-export const dynamicParams = true;
-// 使用动态渲染
+// 强制动态渲染，不进行静态生成
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
 
 interface ToolPageProps {
   params: Promise<{ slug: string }>;
@@ -49,19 +49,3 @@ export default async function ToolPage({ params }: ToolPageProps) {
 
   return <ToolContent tool={tool} />;
 }
-
-  export async function generateStaticParams() {
-    // 在 Docker 构建时跳过静态生成，改为动态渲染
-    if (process.env.SKIP_STATIC_GENERATION === 'true' || !process.env.DATABASE_URL?.includes('mysql://')) {
-      return [];
-    }
-
-    const tools = await prisma.tools.findMany({
-      where: { isPublished: true },
-      select: { slug: true },
-    });
-
-    return tools.map((tool) => ({
-      slug: tool.slug,
-    }));
-  }

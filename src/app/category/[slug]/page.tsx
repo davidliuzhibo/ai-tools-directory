@@ -2,10 +2,10 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import CategoryContent from './CategoryContent';
 
-// 允许访问未预生成的动态路由
-export const dynamicParams = true;
-// 使用动态渲染
+// 强制动态渲染，不进行静态生成
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -51,18 +51,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return <CategoryContent category={category} />;
 }
-
-  export async function generateStaticParams() {
-    // 在 Docker 构建时跳过静态生成，改为动态渲染
-    if (process.env.SKIP_STATIC_GENERATION === 'true' || !process.env.DATABASE_URL?.includes('mysql://')) {
-      return [];
-    }
-
-    const categories = await prisma.categories.findMany({
-      select: { slug: true },
-    });
-
-    return categories.map((category) => ({
-      slug: category.slug,
-    }));
-  }
