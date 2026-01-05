@@ -59,14 +59,22 @@ echo ""
 echo ""
 echo "第二步：克隆项目代码"
 echo "--------------------------------------------------"
-read -p "请输入部署目录路径 (默认: /var/www): " deploy_dir
-deploy_dir=${deploy_dir:-/var/www}
+
+# 检查是否为交互式终端
+if [ -t 0 ]; then
+    read -p "请输入部署目录路径 (默认: /var/www): " deploy_dir
+fi
+
+# 设置默认部署目录
+if [ -z "$deploy_dir" ]; then
+    deploy_dir="/var/www"
+fi
 
 echo "部署目录: $deploy_dir"
 
 # 创建目录
-sudo mkdir -p $deploy_dir
-cd $deploy_dir
+sudo mkdir -p "$deploy_dir"
+cd "$deploy_dir"
 
 # 检查是否已存在项目
 if [ -d "aitools" ]; then
@@ -118,7 +126,25 @@ echo "sudo cp /etc/letsencrypt/live/aidaquanji.com/privkey.pem ./nginx/ssl/"
 echo "sudo chmod 644 ./nginx/ssl/*.pem"
 echo ""
 
-read -p "SSL 证书是否已配置完成? (y/N): " ssl_ready
+# 检查 SSL 证书是否已配置
+if [ -f "./nginx/ssl/fullchain.pem" ] && [ -f "./nginx/ssl/privkey.pem" ]; then
+    echo "✅ SSL 证书已配置，继续部署..."
+    ssl_ready="y"
+else
+    echo "⚠️  SSL 证书尚未配置到项目目录"
+    # 检查是否为交互式终端
+    if [ -t 0 ]; then
+        read -p "SSL 证书是否已配置完成? (y/N): " ssl_ready
+    else
+        echo "非交互模式：请先配置 SSL 证书"
+        echo "运行以下命令："
+        echo "sudo cp /etc/letsencrypt/live/aidaquanji.com/fullchain.pem ./nginx/ssl/"
+        echo "sudo cp /etc/letsencrypt/live/aidaquanji.com/privkey.pem ./nginx/ssl/"
+        echo "sudo chmod 644 ./nginx/ssl/*.pem"
+        exit 1
+    fi
+fi
+
 if [[ ! $ssl_ready =~ ^[Yy]$ ]]; then
     echo "请先配置 SSL 证书后再继续部署"
     exit 1
