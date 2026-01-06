@@ -74,6 +74,10 @@
   COPY docker-entrypoint.sh /app/
   RUN chmod +x /app/docker-entrypoint.sh
 
+  # 创建 npm 缓存目录并设置正确的所有权
+  RUN mkdir -p /app/.npm && \
+      chown -R nextjs:nodejs /app
+
   USER nextjs
 
   EXPOSE 3000
