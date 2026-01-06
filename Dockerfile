@@ -70,13 +70,12 @@
   COPY --from=builder /app/.next/static ./.next/static
   COPY --from=builder /app/prisma ./prisma
   COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-  # 复制 Prisma CLI 用于数据库迁移
-  COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-  COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-  COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
   COPY docker-entrypoint.sh /app/
   RUN chmod +x /app/docker-entrypoint.sh
+
+  # 安装 Prisma CLI 用于数据库迁移
+  RUN npm install -g prisma@5.22.0
 
   # 创建 npm 缓存目录并设置正确的所有权
   RUN mkdir -p /app/.npm && \
