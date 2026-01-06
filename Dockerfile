@@ -70,6 +70,10 @@
   COPY --from=builder /app/.next/static ./.next/static
   COPY --from=builder /app/prisma ./prisma
   COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+  # 复制 Prisma CLI 用于数据库迁移
+  COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+  COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+  COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
   COPY docker-entrypoint.sh /app/
   RUN chmod +x /app/docker-entrypoint.sh
