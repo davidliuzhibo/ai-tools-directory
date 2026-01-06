@@ -17,4 +17,8 @@ docs
 data
 scripts/scrape.ts
 scripts/update-*.ts
+scripts/test-*.ts
 debug-*.png
+# 排除任何错误创建的目录
+deploy_dir*
+**/deploy_dir*

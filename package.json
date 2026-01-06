@@ -58,6 +58,8 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.5.9",
     "ts-node": "^10.9.2"
   }
 }
