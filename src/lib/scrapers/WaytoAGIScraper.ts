@@ -1,5 +1,7 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { BaseScraper, ScraperConfig, ToolData } from './BaseScraper';
+import fs from 'fs';
+import path from 'path';
 
 interface WaytoAGIConfig extends ScraperConfig {
   feishuEmail?: string;
@@ -362,8 +364,6 @@ export class WaytoAGIScraper extends BaseScraper {
    */
   async exportToJSON(filename: string = 'waytoagi-tools.json'): Promise<void> {
     const tools = await this.scrape();
-    const fs = require('fs');
-    const path = require('path');
 
     const outputPath = path.join(process.cwd(), 'data', filename);
 

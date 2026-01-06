@@ -149,7 +149,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Link href={`/tool/${tool.slug}`} className="font-bold text-lg">
+          <Link key={tool.id} href={`/tool/${tool.slug}`} className="font-bold text-lg">
             {tool.name}
           </Link>,
         ])
@@ -161,7 +161,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Text className="text-sm">{tool.description || '-'}</Text>,
+          <Text key={tool.id} className="text-sm">{tool.description || '-'}</Text>,
         ])
       ),
     },
@@ -171,7 +171,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Tag>
+          <Tag key={tool.id}>
             {tool.categories.icon} {tool.categories.name}
           </Tag>,
         ])
@@ -183,7 +183,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Tag color={pricingTypeMap[tool.pricingType].color}>
+          <Tag key={tool.id} color={pricingTypeMap[tool.pricingType].color}>
             {pricingTypeMap[tool.pricingType].label}
           </Tag>,
         ])
@@ -195,7 +195,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Text className="text-sm">{tool.pricingDetails || '-'}</Text>,
+          <Text key={tool.id} className="text-sm">{tool.pricingDetails || '-'}</Text>,
         ])
       ),
     },
@@ -205,7 +205,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Tag color={teamOriginMap[tool.teamOrigin].color}>
+          <Tag key={tool.id} color={teamOriginMap[tool.teamOrigin].color}>
             {teamOriginMap[tool.teamOrigin].label}
           </Tag>,
         ])
@@ -217,7 +217,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <Text strong className="text-lg text-blue-600">
+          <Text key={tool.id} strong className="text-lg text-blue-600">
             {tool.rankingScore.toFixed(1)}/100
           </Text>,
         ])
@@ -311,7 +311,7 @@ export default function CompareContent({ ids }: { ids: string }) {
       ...Object.fromEntries(
         tools.map((tool) => [
           tool.id,
-          <div className="flex flex-col gap-2">
+          <div key={tool.id} className="flex flex-col gap-2">
             {tool.websiteUrl && (
               <a href={tool.websiteUrl} target="_blank" rel="noopener noreferrer">
                 <Button type="primary" size="small" icon={<LinkOutlined />}>

@@ -117,7 +117,7 @@ export default function SearchContent() {
 
             {query && (
               <Paragraph className="mt-4 text-gray-600">
-                搜索 "<strong>{query}</strong>" 找到 {tools.length} 个结果
+                搜索 &ldquo;<strong>{query}</strong>&rdquo; 找到 {tools.length} 个结果
               </Paragraph>
             )}
           </div>
