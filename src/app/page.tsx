@@ -1,73 +1,57 @@
-'use client';
-
 import { Typography, Row, Col, Divider } from "antd";
 import CategoryCard from "@/components/common/CategoryCard";
 import ToolCard from "@/components/tool/ToolCard";
+import prisma from "@/lib/prisma";
 
 const { Title, Paragraph } = Typography;
 
-// 临时数据（后续会从数据库读取）
-const categories = [
-  { name: "语言", slug: "language", description: "ChatGPT等AI语言类工具", icon: "💬", toolCount: 4 },
-  { name: "画图", slug: "image", description: "Midjourney等AI画图工具", icon: "🎨", toolCount: 3 },
-  { name: "编程", slug: "code", description: "GitHub Copilot等AI编程助手", icon: "💻", toolCount: 3 },
-  { name: "视频", slug: "video", description: "AI视频生成和编辑工具", icon: "🎬", toolCount: 2 },
-  { name: "笔记", slug: "note", description: "Notion AI等智能笔记工具", icon: "📝", toolCount: 2 },
-  { name: "个人助理", slug: "assistant", description: "多模态AI助手", icon: "🤖", toolCount: 2 },
-];
+// 从数据库获取分类及工具数量
+async function getCategoriesWithCount() {
+  const categories = await prisma.categories.findMany({
+    orderBy: { order: 'asc' },
+    include: {
+      _count: {
+        select: { tools: { where: { isPublished: true } } }
+      }
+    }
+  });
 
-const featuredTools = [
-  {
-    id: "1",
-    name: "ChatGPT",
-    slug: "chatgpt",
-    description: "OpenAI开发的强大对话AI，支持多种任务",
-    logoUrl: null,
-    websiteUrl: "https://chat.openai.com",
-    teamOrigin: "OVERSEAS" as const,
-    pricingType: "FREEMIUM" as const,
-    rankingScore: 95,
-    platformAvailability: { pc: true, ios: true, android: true, web: true },
-  },
-  {
-    id: "2",
-    name: "Midjourney",
-    slug: "midjourney",
-    description: "领先的AI图像生成工具",
-    logoUrl: null,
-    websiteUrl: "https://midjourney.com",
-    teamOrigin: "OVERSEAS" as const,
-    pricingType: "PAID" as const,
-    rankingScore: 92,
-    platformAvailability: { web: true },
-  },
-  {
-    id: "3",
-    name: "GitHub Copilot",
-    slug: "github-copilot",
-    description: "AI编程助手，提高开发效率",
-    logoUrl: null,
-    websiteUrl: "https://github.com/features/copilot",
-    teamOrigin: "OVERSEAS" as const,
-    pricingType: "PAID" as const,
-    rankingScore: 90,
-    platformAvailability: { pc: true, web: true },
-  },
-  {
-    id: "4",
-    name: "文心一言",
-    slug: "wenxin",
-    description: "百度开发的中文大语言模型",
-    logoUrl: null,
-    websiteUrl: "https://yiyan.baidu.com",
-    teamOrigin: "DOMESTIC" as const,
-    pricingType: "FREE" as const,
-    rankingScore: 85,
-    platformAvailability: { pc: true, web: true },
-  },
-];
+  return categories.map(cat => ({
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description || '',
+    icon: cat.icon || '📁',
+    toolCount: cat._count.tools
+  }));
+}
 
-export default function Home() {
+// 获取精选工具（如果没有设置 featured，则按评分取前4个）
+async function getFeaturedTools() {
+  // 先尝试获取精选工具
+  let tools = await prisma.tools.findMany({
+    where: {
+      isPublished: true,
+      isFeatured: true
+    },
+    orderBy: { rankingScore: 'desc' },
+    take: 4,
+  });
+
+  // 如果没有精选工具，则按评分获取前4个
+  if (tools.length === 0) {
+    tools = await prisma.tools.findMany({
+      where: { isPublished: true },
+      orderBy: { rankingScore: 'desc' },
+      take: 4,
+    });
+  }
+
+  return tools;
+}
+
+export default async function Home() {
+  const categories = await getCategoriesWithCount();
+  const featuredTools = await getFeaturedTools();
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white">
       {/* Hero Section */}
