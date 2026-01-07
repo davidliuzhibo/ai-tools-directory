@@ -46,7 +46,11 @@ async function getFeaturedTools() {
     });
   }
 
-  return tools;
+  // 转换数据类型以匹配 ToolCard props
+  return tools.map(tool => ({
+    ...tool,
+    platformAvailability: tool.platformAvailability as any
+  }));
 }
 
 export default async function Home() {
