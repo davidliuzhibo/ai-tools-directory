@@ -5,6 +5,9 @@ import prisma from "@/lib/prisma";
 
 const { Title, Paragraph } = Typography;
 
+// 强制动态渲染，不进行静态生成
+export const dynamic = 'force-dynamic';
+
 // 从数据库获取分类及工具数量
 async function getCategoriesWithCount() {
   const categories = await prisma.categories.findMany({
