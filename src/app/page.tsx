@@ -8,12 +8,12 @@ const { Title, Paragraph } = Typography;
 
 // 临时数据（后续会从数据库读取）
 const categories = [
-  { name: "语言", slug: "language", description: "ChatGPT等AI语言类工具", icon: "💬", toolCount: 15 },
-  { name: "画图", slug: "image", description: "Midjourney等AI画图工具", icon: "🎨", toolCount: 12 },
-  { name: "编程", slug: "code", description: "GitHub Copilot等AI编程助手", icon: "💻", toolCount: 20 },
-  { name: "视频", slug: "video", description: "AI视频生成和编辑工具", icon: "🎬", toolCount: 8 },
-  { name: "笔记", slug: "note", description: "Notion AI等智能笔记工具", icon: "📝", toolCount: 10 },
-  { name: "个人助理", slug: "assistant", description: "多模态AI助手", icon: "🤖", toolCount: 18 },
+  { name: "语言", slug: "language", description: "ChatGPT等AI语言类工具", icon: "💬", toolCount: 4 },
+  { name: "画图", slug: "image", description: "Midjourney等AI画图工具", icon: "🎨", toolCount: 3 },
+  { name: "编程", slug: "code", description: "GitHub Copilot等AI编程助手", icon: "💻", toolCount: 3 },
+  { name: "视频", slug: "video", description: "AI视频生成和编辑工具", icon: "🎬", toolCount: 2 },
+  { name: "笔记", slug: "note", description: "Notion AI等智能笔记工具", icon: "📝", toolCount: 2 },
+  { name: "个人助理", slug: "assistant", description: "多模态AI助手", icon: "🤖", toolCount: 2 },
 ];
 
 const featuredTools = [
